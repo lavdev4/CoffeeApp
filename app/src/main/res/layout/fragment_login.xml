@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/email_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:text="@string/text_field_e_mail_title"
+        android:textSize="15sp"
+        android:textColor="@color/brown"
+        app:layout_constraintLeft_toLeftOf="@id/email_field"
+        app:layout_constraintBottom_toTopOf="@id/email_field" />
+
+    <EditText
+        android:id="@+id/email_field"
+        android:layout_width="match_parent"
+        android:layout_height="47dp"
+        android:layout_marginHorizontal="18dp"
+        android:paddingHorizontal="18dp"
+        android:hint="@string/login_field_hint"
+        android:textSize="18sp"
+        android:textColor="@color/light_brown"
+        android:background="@drawable/background_text_field"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/password_field"
+        app:layout_constraintVertical_chainStyle="packed"
+        android:importantForAutofill="no"
+        tools:text="Значение поля"
+        tools:ignore="LabelFor,TextFields" />
+
+    <TextView
+        android:id="@+id/password_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:text="@string/text_field_password_title"
+        android:textSize="15sp"
+        android:textColor="@color/brown"
+        app:layout_constraintLeft_toLeftOf="@id/password_field"
+        app:layout_constraintBottom_toTopOf="@id/password_field" />
+
+    <EditText
+        android:id="@+id/password_field"
+        android:layout_width="match_parent"
+        android:layout_height="47dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginHorizontal="18dp"
+        android:paddingHorizontal="18dp"
+        android:hint="@string/password_field_hint"
+        android:textSize="18sp"
+        android:textColor="@color/light_brown"
+        android:inputType="textPassword"
+        android:background="@drawable/background_text_field"
+        app:layout_constraintTop_toBottomOf="@id/email_field"
+        app:layout_constraintBottom_toTopOf="@id/login_button"
+        tools:text="Значение поля"
+        android:importantForAutofill="no"
+        tools:ignore="TextFields" />
+
+    <Button
+        android:id="@+id/login_button"
+        android:layout_width="match_parent"
+        android:layout_height="47dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginHorizontal="18dp"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:backgroundTint="@color/dark_brown"
+        android:text="@string/button_enter_text"
+        android:textColor="@color/very_light_brown"
+        android:textSize="18sp"
+        app:layout_constraintTop_toBottomOf="@id/password_field"
+        app:layout_constraintBottom_toTopOf="@id/register_button"/>
+
+    <Button
+        android:id="@+id/register_button"
+        android:layout_width="match_parent"
+        android:layout_height="47dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginHorizontal="18dp"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:backgroundTint="@color/dark_brown"
+        android:text="@string/button_register_text"
+        android:textColor="@color/very_light_brown"
+        android:textSize="18sp"
+        app:layout_constraintTop_toBottomOf="@id/login_button"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

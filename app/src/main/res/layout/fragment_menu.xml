@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/product_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingTop="16dp"
+        android:paddingStart="3dp"
+        android:paddingEnd="3dp"
+        tools:itemCount="10"
+        tools:listitem="@layout/item_products"/>
+
+    <Button
+        android:id="@+id/payment_button"
+        android:layout_width="match_parent"
+        android:layout_height="47dp"
+        android:layout_gravity="bottom"
+        android:layout_marginHorizontal="18dp"
+        android:layout_marginBottom="33dp"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:backgroundTint="@color/dark_brown"
+        android:text="@string/button_go_to_pay"
+        android:textColor="@color/very_light_brown"
+        android:textSize="18sp"/>
+</FrameLayout>

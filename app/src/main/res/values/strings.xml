@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">CoffeeApp</string>
+    <string name="button_register_text">Регистрация</string>
+    <string name="text_field_e_mail_title">e-mail</string>
+    <string name="text_field_password_title">Пароль</string>
+    <string name="text_field_repeat_password_title">Повторите пароль</string>
+    <string name="button_enter_text">Войти</string>
+    <string name="cafes_screen_title">Ближайшие кофейни</string>
+    <string name="login_screen_title">Вход</string>
+    <string name="registration_screen_title">Регистрация</string>
+    <string name="button_show_map_text">На карте</string>
+    <string name="password_field_hint">******</string>
+    <string name="login_field_hint">example@example.ru</string>
+    <string name="button_go_to_pay">Перейти к оплате</string>
+    <string name="menu_screen_title">Меню</string>
+    <string name="button_text_pay">Оплатить</string>
+    <string name="cart_screen_title">Ваш заказ</string>
+    <string name="cart_screen_waiting_time">Время ожидания заказа\n%1$s минут!\nСпасибо, что выбрали нас!</string>
+    <string name="cart_screen_waiting_hint">Пожалуйста, добавьте товары в корзину.</string>
+    <string name="item_price_wrapper">%1$s руб</string>
+</resources>

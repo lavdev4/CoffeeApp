@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_graph"
+    app:startDestination="@id/cart_screen">
+
+    <navigation android:id="@+id/login_graph"
+        app:startDestination="@id/login_screen">
+        <fragment
+            android:id="@+id/register_screen"
+            android:name="com.example.coffeeapp.presentation.screens.RegisterScreen"
+            android:label="@string/registration_screen_title"
+            tools:layout="@layout/fragment_register" />
+        <fragment
+            android:id="@+id/login_screen"
+            android:name="com.example.coffeeapp.presentation.screens.LoginScreen"
+            android:label="@string/login_screen_title"
+            tools:layout="@layout/fragment_login">
+            <action
+                android:id="@+id/action_login_screen_to_register_screen"
+                app:destination="@id/register_screen" />
+        </fragment>
+        <action
+            android:id="@+id/action_global_cafes_graph"
+            app:destination="@id/cafes_graph"
+            app:popUpTo="@id/main_graph"
+            app:popUpToInclusive="true" />
+    </navigation>
+
+    <navigation android:id="@+id/cafes_graph"
+        app:startDestination="@id/cafes_screen">
+        <fragment
+            android:id="@+id/cafes_screen"
+            android:name="com.example.coffeeapp.presentation.screens.CafesScreen"
+            android:label="@string/cafes_screen_title"
+            tools:layout="@layout/fragment_cafes" >
+            <action
+                android:id="@+id/action_cafes_screen_to_menu_screen"
+                app:destination="@id/menu_screen" />
+        </fragment>
+        <action
+            android:id="@+id/action_global_login_graph"
+            app:destination="@id/login_graph"
+            app:popUpTo="@id/main_graph"
+            app:popUpToInclusive="true" />
+        <fragment
+            android:id="@+id/menu_screen"
+            android:name="com.example.coffeeapp.presentation.screens.MenuScreen"
+            android:label="@string/menu_screen_title"
+            tools:layout="@layout/fragment_menu">
+            <argument
+                android:name="location_id"
+                app:argType="integer" />
+            <action
+                android:id="@+id/action_menu_screen_to_cartScreen"
+                app:destination="@id/cart_screen" />
+        </fragment>
+        <fragment
+            android:id="@+id/cart_screen"
+            android:name="com.example.coffeeapp.presentation.screens.CartScreen"
+            android:label="@string/cart_screen_title"
+            tools:layout="@layout/fragment_cart" />
+    </navigation>
+</navigation>
