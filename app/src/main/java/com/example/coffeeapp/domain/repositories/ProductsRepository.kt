@@ -1,6 +1,5 @@
-package com.example.coffeeapp.domain
+package com.example.coffeeapp.domain.repositories
 
-import com.example.coffeeapp.domain.entities.CafeEntity
 import com.example.coffeeapp.domain.entities.NetworkResultEntity
 import com.example.coffeeapp.domain.entities.ProductEntity
 

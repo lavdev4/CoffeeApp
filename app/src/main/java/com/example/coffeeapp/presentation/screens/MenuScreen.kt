@@ -14,15 +14,15 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.example.coffeeapp.R
 import com.example.coffeeapp.databinding.FragmentMenuBinding
 import com.example.coffeeapp.presentation.MainActivity
-import com.example.coffeeapp.presentation.adapters.GridMarginItemDecoration
 import com.example.coffeeapp.presentation.adapters.ProductsAdapter
-import com.example.coffeeapp.presentation.viewmodels.AppViewModelFactory
+import com.example.coffeeapp.presentation.adapters.decorators.GridMarginItemDecoration
 import com.example.coffeeapp.presentation.viewmodels.ProductsViewModel
+import com.example.coffeeapp.presentation.viewmodels.factories.CafesGraphVMFactory
 import javax.inject.Inject
 
 class MenuScreen : Fragment() {
     @Inject
-    lateinit var viewModelFactory: AppViewModelFactory
+    lateinit var viewModelFactory: CafesGraphVMFactory
     private lateinit var navController: NavController
     private val args: MenuScreenArgs by navArgs()
     private val viewModel by navGraphViewModels<ProductsViewModel>(R.id.cafes_graph) {

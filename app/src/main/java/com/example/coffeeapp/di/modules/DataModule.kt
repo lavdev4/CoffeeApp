@@ -1,11 +1,13 @@
 package com.example.coffeeapp.di.modules
 
-import com.example.coffeeapp.data.AuthRepositoryImpl
-import com.example.coffeeapp.data.CafesRepositoryImpl
-import com.example.coffeeapp.data.ProductsRepositoryImpl
-import com.example.coffeeapp.domain.AuthRepository
-import com.example.coffeeapp.domain.CafesRepository
-import com.example.coffeeapp.domain.ProductsRepository
+import com.example.coffeeapp.data.repositories.AuthRepositoryImpl
+import com.example.coffeeapp.data.repositories.CafesRepositoryImpl
+import com.example.coffeeapp.data.repositories.ProductsRepositoryImpl
+import com.example.coffeeapp.data.repositories.TokenRepositoryImpl
+import com.example.coffeeapp.domain.repositories.AuthRepository
+import com.example.coffeeapp.domain.repositories.CafesRepository
+import com.example.coffeeapp.domain.repositories.ProductsRepository
+import com.example.coffeeapp.domain.repositories.TokenRepository
 import dagger.Binds
 import dagger.Module
 
@@ -20,4 +22,7 @@ interface DataModule {
 
     @Binds
     fun bindProductsRepository(repository: ProductsRepositoryImpl): ProductsRepository
+
+    @Binds
+    fun bindTokenRepository(repository: TokenRepositoryImpl): TokenRepository
 }

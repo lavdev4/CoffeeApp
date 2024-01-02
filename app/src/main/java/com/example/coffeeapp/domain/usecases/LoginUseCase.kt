@@ -1,13 +1,16 @@
-package com.example.coffeeapp.domain
+package com.example.coffeeapp.domain.usecases
 
 import com.example.coffeeapp.domain.entities.AuthError
 import com.example.coffeeapp.domain.entities.AuthResult
 import com.example.coffeeapp.domain.entities.NetworkError
 import com.example.coffeeapp.domain.entities.NetworkResultEntity
+import com.example.coffeeapp.domain.repositories.AuthRepository
+import com.example.coffeeapp.domain.repositories.TokenRepository
 import javax.inject.Inject
 
 class LoginUseCase @Inject constructor(
     private val authRepository: AuthRepository,
+    private val tokenRepository: TokenRepository
 ) {
 
     suspend fun logIn(login: String, password: String): AuthResult {
@@ -16,11 +19,17 @@ class LoginUseCase @Inject constructor(
 
         return when (val result = authRepository.loginUser(login, password)) {
             is NetworkResultEntity.Success -> {
-                authRepository.saveToken(result.data)
+                tokenRepository.setAuthToken(result.data)
                 AuthResult.Success
             }
-            NetworkResultEntity.Failure(NetworkError.Unauthorised) -> AuthResult.Failure(AuthError.DataMismatch)
-            else -> AuthResult.Failure(AuthError.AuthNetworkError((result as NetworkResultEntity.Failure).error))
+            NetworkResultEntity.Failure(NetworkError.Unauthorised) -> {
+                AuthResult.Failure(AuthError.DataMismatch)
+            }
+            else -> {
+                AuthResult.Failure(
+                    AuthError.AuthNetworkError((result as NetworkResultEntity.Failure).error)
+                )
+            }
         }
     }
 }

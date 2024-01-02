@@ -19,7 +19,7 @@ class ProductsMapper @Inject constructor() {
             when (response.code()) {
                 401 -> NetworkResultEntity.Failure(NetworkError.TokenExpired)
                 1 -> NetworkResultEntity.Failure(NetworkError.NoInternet)
-                else -> NetworkResultEntity.Failure(NetworkError.Error)
+                else -> NetworkResultEntity.Failure(NetworkError.UnknownError)
             }
         }
     }

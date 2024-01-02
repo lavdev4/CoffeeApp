@@ -1,11 +1,11 @@
-package com.example.coffeeapp.data
+package com.example.coffeeapp.data.repositories
 
 import com.example.coffeeapp.data.mappers.ProductsMapper
 import com.example.coffeeapp.data.network.ApiService
 import com.example.coffeeapp.di.annotations.ApplicationScope
-import com.example.coffeeapp.domain.ProductsRepository
 import com.example.coffeeapp.domain.entities.NetworkResultEntity
 import com.example.coffeeapp.domain.entities.ProductEntity
+import com.example.coffeeapp.domain.repositories.ProductsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject

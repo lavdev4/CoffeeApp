@@ -6,18 +6,29 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.viewModelScope
-import com.example.coffeeapp.domain.GetProductsUseCase
 import com.example.coffeeapp.domain.entities.NetworkError
 import com.example.coffeeapp.domain.entities.NetworkResultEntity
 import com.example.coffeeapp.domain.entities.ProductEntity
+import com.example.coffeeapp.domain.usecases.GetProductsUseCase
+import com.example.coffeeapp.presentation.viewmodels.contracts.CafesGraphViewModel
+import com.example.coffeeapp.presentation.viewmodels.contracts.NetworkErrorViewModel
+import com.example.coffeeapp.presentation.viewmodels.contracts.ScreenStateViewModel
+import com.example.coffeeapp.presentation.viewmodels.states.ScreenState
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class ProductsViewModel @Inject constructor(
     private val getProductsUseCase: GetProductsUseCase
-) : ViewModel() {
+) : ViewModel(),
+    CafesGraphViewModel,
+    ScreenStateViewModel,
+    NetworkErrorViewModel {
 
     private var currentLocation: Int? = null
+
+    private val _screenState = MutableLiveData<ScreenState>(ScreenState.Initial)
+    override val screenState: LiveData<ScreenState>
+        get() = _screenState
 
     private val _productsList: MutableLiveData<List<ProductEntity>> = MutableLiveData()
     val productsList: LiveData<List<ProductEntity>>
@@ -29,20 +40,26 @@ class ProductsViewModel @Inject constructor(
         get() = _selectedProductsList
 
     private val _networkErrors = MutableLiveData<NetworkError>()
-    val networkErrors: LiveData<NetworkError>
+    override val networkErrors: LiveData<NetworkError>
         get() = _networkErrors.distinctUntilChanged()
 
     @SuppressLint("NullSafeMutableLiveData")
     fun updateProducts(locationId: Int) {
         if (locationId != currentLocation) {
+            _productsList.value = emptyList()
+            _selectedProductsList.value = emptyList()
             viewModelScope.launch {
+                _screenState.value = ScreenState.Loading
                 when (val result = getProductsUseCase.getProducts(locationId)) {
                     is NetworkResultEntity.Success -> {
                         _productsList.value = result.data
-                        _selectedProductsList.value = emptyList()
+                        _screenState.value = ScreenState.Presenting
                         currentLocation = locationId
                     }
-                    is NetworkResultEntity.Failure -> _networkErrors.value = result.error
+                    is NetworkResultEntity.Failure -> {
+                        _networkErrors.value = result.error
+                        _screenState.value = ScreenState.Error
+                    }
                 }
             }
         }

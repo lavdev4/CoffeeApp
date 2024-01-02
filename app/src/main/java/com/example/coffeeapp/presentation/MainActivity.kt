@@ -1,14 +1,15 @@
 package com.example.coffeeapp.presentation
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.LiveData
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelStoreOwner
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
@@ -17,18 +18,24 @@ import com.example.coffeeapp.databinding.ActivityMainBinding
 import com.example.coffeeapp.di.MainActivitySubcomponent
 import com.example.coffeeapp.domain.entities.AuthError
 import com.example.coffeeapp.domain.entities.NetworkError
-import com.example.coffeeapp.presentation.viewmodels.AppViewModelFactory
-import com.example.coffeeapp.presentation.viewmodels.CafesViewModel
-import com.example.coffeeapp.presentation.viewmodels.GraphState
 import com.example.coffeeapp.presentation.viewmodels.GraphsViewModel
-import com.example.coffeeapp.presentation.viewmodels.LoginViewModel
-import com.example.coffeeapp.presentation.viewmodels.ProductsViewModel
-import com.example.coffeeapp.presentation.viewmodels.RegisterViewModel
+import com.example.coffeeapp.presentation.viewmodels.contracts.AuthErrorViewModel
+import com.example.coffeeapp.presentation.viewmodels.contracts.NetworkErrorViewModel
+import com.example.coffeeapp.presentation.viewmodels.contracts.ScreenStateViewModel
+import com.example.coffeeapp.presentation.viewmodels.factories.ApplicationVMFactory
+import com.example.coffeeapp.presentation.viewmodels.factories.CafesGraphVMFactory
+import com.example.coffeeapp.presentation.viewmodels.factories.LoginGraphVMFactory
+import com.example.coffeeapp.presentation.viewmodels.states.GraphState
+import com.example.coffeeapp.presentation.viewmodels.states.ScreenState
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
     @Inject
-    lateinit var viewModelFactory: AppViewModelFactory
+    lateinit var viewModelFactory: ApplicationVMFactory
+    @Inject
+    lateinit var loginGraphVMFactory: LoginGraphVMFactory
+    @Inject
+    lateinit var cafesGraphVMFactory: CafesGraphVMFactory
     private val graphViewModel by viewModels<GraphsViewModel> { viewModelFactory }
     lateinit var mainActivitySubcomponent: MainActivitySubcomponent
     private lateinit var navController: NavController
@@ -74,8 +81,8 @@ class MainActivity : AppCompatActivity() {
                  * Thus, having made sure that we are in a specific graph,
                  * we can get a view model of any screen from the current
                  * graph and track their state.*/
-                GraphState.LoginGraph -> observeLoginGraphErrors()
-                GraphState.CafesGraph -> observeCafesGraphErrors()
+                GraphState.LoginGraph -> observeGraph(loginGraphId)
+                GraphState.CafesGraph -> observeGraph(cafesGraphId)
             }
         }
     }
@@ -83,7 +90,10 @@ class MainActivity : AppCompatActivity() {
     private fun listenToDestinationChange() {
         destinationChangedListener =
             NavController.OnDestinationChangedListener { _, destination, _ ->
-                destination.parent?.id?.let { setGraphState(it) }
+                destination.parent?.id?.let {
+                    setBackButtonVisible(it)
+                    setGraphState(it)
+                }
                 setScreenTitle(destination.label.toString())
             }
         navController.addOnDestinationChangedListener(
@@ -93,14 +103,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun setGraphState(destinationId: Int) {
         when(destinationId) {
-            loginGraphId -> {
-                graphViewModel.setGraphState(GraphState.LoginGraph)
-                setBackButtonVisible(false)
-            }
-            cafesGraphId -> {
-                graphViewModel.setGraphState(GraphState.CafesGraph)
-                setBackButtonVisible(true)
-            }
+            loginGraphId -> graphViewModel.setGraphState(GraphState.LoginGraph)
+            cafesGraphId -> graphViewModel.setGraphState(GraphState.CafesGraph)
         }
     }
 
@@ -108,8 +112,13 @@ class MainActivity : AppCompatActivity() {
         binding.title.text = title
     }
 
-    private fun setBackButtonVisible(visible: Boolean) {
-        binding.backButton.visibility = if (visible) View.VISIBLE else View.GONE
+    private fun setBackButtonVisible(graphId: Int) {
+        with(binding.backButton) {
+            when (graphId) {
+                loginGraphId -> visibility = View.GONE
+                cafesGraphId -> visibility = View.VISIBLE
+            }
+        }
     }
 
     private fun setupBackButton() {
@@ -120,35 +129,56 @@ class MainActivity : AppCompatActivity() {
         destinationChangedListener?.let { navController.removeOnDestinationChangedListener(it) }
     }
 
-    private fun observeLoginGraphErrors() {
-        val lifecycleOwner = navController.getBackStackEntry(loginGraphId)
-        val graphViewModelStoreOwner = navController.getViewModelStoreOwner(loginGraphId)
-        val graphViewModelProvider =
-            ViewModelProvider(graphViewModelStoreOwner, viewModelFactory)
-        val loginViewModel = graphViewModelProvider[LoginViewModel::class.java]
-        val registerViewModel = graphViewModelProvider[RegisterViewModel::class.java]
-        getMediatorLiveData(
-            loginViewModel.authErrors,
-            registerViewModel.authErrors
-        ).observe(lifecycleOwner) { reactToAuthError(it) }
+    private fun observeGraph(graphId: Int) {
+        val lifecycleOwner = navController.getBackStackEntry(graphId)
+        val graphViewModelStoreOwner = navController.getViewModelStoreOwner(graphId)
+        val graphViewModels = getGraphViewModels(graphId, graphViewModelStoreOwner)
+        observeNetworkErrors(graphViewModels, lifecycleOwner)
+        observeAuthErrors(graphViewModels, lifecycleOwner)
+        observeViewStates(graphViewModels, lifecycleOwner)
     }
 
-    private fun observeCafesGraphErrors() {
-        Log.d("Destination", "graph observed: cafes_g")
-        val lifecycleOwner = navController.getBackStackEntry(cafesGraphId)
-        val graphViewModelStoreOwner = navController.getViewModelStoreOwner(cafesGraphId)
-        val graphViewModelProvider =
-            ViewModelProvider(graphViewModelStoreOwner, viewModelFactory)
-        val cafesViewModel = graphViewModelProvider[CafesViewModel::class.java]
-        val productsViewModel = graphViewModelProvider[ProductsViewModel::class.java]
-        getMediatorLiveData(
-            cafesViewModel.networkErrors,
-            productsViewModel.networkErrors
-        ).observe(lifecycleOwner) { reactToNetworkError(it) }
+    private fun observeNetworkErrors(viewModels: List<ViewModel>, lifecycleOwner: LifecycleOwner) {
+        MediatorLiveData<NetworkError>().apply {
+            viewModels.forEach { vm ->
+                if (vm is NetworkErrorViewModel) addSource(vm.networkErrors) { value = it }
+            }
+        }.observe(lifecycleOwner) { error -> reactToNetworkError(error) }
+    }
+
+    private fun observeAuthErrors(viewModels: List<ViewModel>, lifecycleOwner: LifecycleOwner) {
+        MediatorLiveData<AuthError>().apply {
+            viewModels.forEach { vm ->
+                if (vm is AuthErrorViewModel) addSource(vm.authErrors) { value = it }
+            }
+        }.observe(lifecycleOwner) { error -> reactToAuthError(error) }
+    }
+
+    private fun observeViewStates(viewModels: List<ViewModel>, lifecycleOwner: LifecycleOwner) {
+        MediatorLiveData<ScreenState>().apply {
+            viewModels.forEach { vm ->
+                if (vm is ScreenStateViewModel) addSource(vm.screenState) { value = it }
+            }
+        }.observe(lifecycleOwner) { state -> reactToStateChange(state) }
+    }
+
+    private fun getGraphViewModels(
+        graphId: Int,
+        viewModelStoreOwner: ViewModelStoreOwner
+    ): List<ViewModel> {
+        return when (graphId) {
+            loginGraphId -> with(loginGraphVMFactory) {
+                viewModels.keys.map { ViewModelProvider(viewModelStoreOwner, this)[it] }
+            }
+            cafesGraphId -> with(cafesGraphVMFactory) {
+                viewModels.keys.map { ViewModelProvider(viewModelStoreOwner, this)[it] }
+            }
+            else -> throw RuntimeException("Graph with id{$graphId} is not handled in MainActivity.")
+        }
     }
 
     private fun reactToAuthError(error: AuthError) {
-        when(error) {
+        when (error) {
             AuthError.LoginIsBlank -> showToast("Поле логина пусто")
             AuthError.PasswordIsBlank -> showToast("Поле пароля пусто")
             AuthError.RepeatPasswordIsBlank -> showToast("Поле подтверждения пароля пусто")
@@ -160,7 +190,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun reactToNetworkError(error: NetworkError) {
-        when(error) {
+        when (error) {
             NetworkError.NoInternet -> {
                 showToast("Нет интернет соединения")
                 navigateToLoginGraph()
@@ -174,7 +204,16 @@ class MainActivity : AppCompatActivity() {
                 navigateToLoginGraph()
             }
             NetworkError.NoTokenProvided -> navigateToLoginGraph()
-            NetworkError.Error -> showToast("Ошибка сети")
+            NetworkError.UnknownError -> showToast("Ошибка сети")
+        }
+    }
+
+    private fun reactToStateChange(state: ScreenState) {
+        when (state) {
+            ScreenState.Initial -> showProgress(false)
+            ScreenState.Loading -> showProgress(true)
+            ScreenState.Presenting -> showProgress(false)
+            ScreenState.Error -> showProgress(false)
         }
     }
 
@@ -192,11 +231,7 @@ class MainActivity : AppCompatActivity() {
         Toast.makeText(this, text, Toast.LENGTH_LONG).show()
     }
 
-    private fun <T : Any?> getMediatorLiveData(
-        vararg sources: LiveData<T>
-    ): MediatorLiveData<T> {
-        return MediatorLiveData<T>().apply {
-            sources.forEach { source -> addSource(source) { value = it } }
-        }
+    private fun showProgress(show: Boolean) {
+        binding.progress.visibility = if (show) View.VISIBLE else View.GONE
     }
 }

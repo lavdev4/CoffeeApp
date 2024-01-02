@@ -4,7 +4,6 @@ import com.example.coffeeapp.data.network.models.LocationRespondDto
 import com.example.coffeeapp.domain.entities.CafeEntity
 import com.example.coffeeapp.domain.entities.NetworkError
 import com.example.coffeeapp.domain.entities.NetworkResultEntity
-import com.google.gson.Gson
 import retrofit2.Response
 import javax.inject.Inject
 
@@ -20,7 +19,7 @@ class CafesMapper @Inject constructor() {
             when (response.code()) {
                 401 -> NetworkResultEntity.Failure(NetworkError.TokenExpired)
                 1 -> NetworkResultEntity.Failure(NetworkError.NoInternet)
-                else -> NetworkResultEntity.Failure(NetworkError.Error)
+                else -> NetworkResultEntity.Failure(NetworkError.UnknownError)
             }
         }
     }

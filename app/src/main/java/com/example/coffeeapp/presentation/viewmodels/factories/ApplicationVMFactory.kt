@@ -1,4 +1,4 @@
-package com.example.coffeeapp.presentation.viewmodels
+package com.example.coffeeapp.presentation.viewmodels.factories
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -7,7 +7,7 @@ import javax.inject.Inject
 import javax.inject.Provider
 
 @ApplicationScope
-class AppViewModelFactory @Inject constructor(
+class ApplicationVMFactory @Inject constructor(
     private val viewModels: @JvmSuppressWildcards Map<Class<out ViewModel>, Provider<ViewModel>>
 ) : ViewModelProvider.Factory {
 

@@ -13,14 +13,14 @@ import com.example.coffeeapp.R
 import com.example.coffeeapp.databinding.FragmentCartBinding
 import com.example.coffeeapp.presentation.MainActivity
 import com.example.coffeeapp.presentation.adapters.CartProductsAdapter
-import com.example.coffeeapp.presentation.adapters.VerticalMarginItemDecoration
-import com.example.coffeeapp.presentation.viewmodels.AppViewModelFactory
+import com.example.coffeeapp.presentation.adapters.decorators.VerticalMarginItemDecoration
 import com.example.coffeeapp.presentation.viewmodels.ProductsViewModel
+import com.example.coffeeapp.presentation.viewmodels.factories.CafesGraphVMFactory
 import javax.inject.Inject
 
 class CartScreen : Fragment() {
     @Inject
-    lateinit var viewModelFactory: AppViewModelFactory
+    lateinit var viewModelFactory: CafesGraphVMFactory
     private val viewModel by navGraphViewModels<ProductsViewModel>(R.id.cafes_graph) {
         viewModelFactory
     }

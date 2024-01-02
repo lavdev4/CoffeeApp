@@ -16,14 +16,14 @@ import com.example.coffeeapp.databinding.FragmentCafesBinding
 import com.example.coffeeapp.domain.entities.CafeEntity
 import com.example.coffeeapp.presentation.MainActivity
 import com.example.coffeeapp.presentation.adapters.CafesAdapter
-import com.example.coffeeapp.presentation.adapters.VerticalMarginItemDecoration
-import com.example.coffeeapp.presentation.viewmodels.AppViewModelFactory
+import com.example.coffeeapp.presentation.adapters.decorators.VerticalMarginItemDecoration
 import com.example.coffeeapp.presentation.viewmodels.CafesViewModel
+import com.example.coffeeapp.presentation.viewmodels.factories.CafesGraphVMFactory
 import javax.inject.Inject
 
 class CafesScreen : Fragment() {
     @Inject
-    lateinit var viewModelFactory: AppViewModelFactory
+    lateinit var viewModelFactory: CafesGraphVMFactory
     private lateinit var navController: NavController
     private val viewModel by navGraphViewModels<CafesViewModel>(R.id.cafes_graph) {
         viewModelFactory

@@ -1,10 +1,10 @@
-package com.example.coffeeapp.data
+package com.example.coffeeapp.data.repositories
 
 import com.example.coffeeapp.data.mappers.AuthMapper
 import com.example.coffeeapp.data.network.ApiService
 import com.example.coffeeapp.di.annotations.ApplicationScope
-import com.example.coffeeapp.domain.AuthRepository
 import com.example.coffeeapp.domain.entities.NetworkResultEntity
+import com.example.coffeeapp.domain.repositories.AuthRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -12,7 +12,6 @@ import javax.inject.Inject
 @ApplicationScope
 class AuthRepositoryImpl @Inject constructor(
     private val apiService: ApiService,
-    private val preferences: AppPreferences,
     private val mapper: AuthMapper
 ) : AuthRepository {
 
@@ -28,13 +27,5 @@ class AuthRepositoryImpl @Inject constructor(
             apiService.login(mapper.mapLoginPasswordToLoginData(login, password))
         }
         return mapper.mapResponseToResultWithToken(response)
-    }
-
-    override fun saveToken(token: String) {
-        preferences.setAuthToken(token)
-    }
-
-    override fun getToken(): String? {
-        return preferences.getAuthToken()
     }
 }

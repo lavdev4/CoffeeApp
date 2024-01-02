@@ -7,6 +7,8 @@ import com.example.coffeeapp.presentation.viewmodels.GraphsViewModel
 import com.example.coffeeapp.presentation.viewmodels.LoginViewModel
 import com.example.coffeeapp.presentation.viewmodels.ProductsViewModel
 import com.example.coffeeapp.presentation.viewmodels.RegisterViewModel
+import com.example.coffeeapp.presentation.viewmodels.contracts.CafesGraphViewModel
+import com.example.coffeeapp.presentation.viewmodels.contracts.LoginGraphViewModel
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
@@ -17,22 +19,22 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(RegisterViewModel::class)
     @Binds
-    abstract fun bindRegisterViewModel(impl: RegisterViewModel): ViewModel
+    abstract fun bindRegisterViewModel(impl: RegisterViewModel): LoginGraphViewModel
 
     @IntoMap
     @ViewModelKey(LoginViewModel::class)
     @Binds
-    abstract fun bindLoginViewModel(impl: LoginViewModel): ViewModel
+    abstract fun bindLoginViewModel(impl: LoginViewModel): LoginGraphViewModel
 
     @IntoMap
     @ViewModelKey(CafesViewModel::class)
     @Binds
-    abstract fun bindCafesViewModel(impl: CafesViewModel): ViewModel
+    abstract fun bindCafesViewModel(impl: CafesViewModel): CafesGraphViewModel
 
     @IntoMap
     @ViewModelKey(ProductsViewModel::class)
     @Binds
-    abstract fun bindProductsViewModel(impl: ProductsViewModel): ViewModel
+    abstract fun bindProductsViewModel(impl: ProductsViewModel): CafesGraphViewModel
 
     @IntoMap
     @ViewModelKey(GraphsViewModel::class)

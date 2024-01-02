@@ -14,14 +14,14 @@ import com.example.coffeeapp.LoginGraphDirections
 import com.example.coffeeapp.R
 import com.example.coffeeapp.databinding.FragmentRegisterBinding
 import com.example.coffeeapp.presentation.MainActivity
-import com.example.coffeeapp.presentation.viewmodels.AppViewModelFactory
 import com.example.coffeeapp.presentation.viewmodels.RegisterViewModel
+import com.example.coffeeapp.presentation.viewmodels.factories.LoginGraphVMFactory
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class RegisterScreen : Fragment() {
     @Inject
-    lateinit var viewModelFactory: AppViewModelFactory
+    lateinit var viewModelFactory: LoginGraphVMFactory
     private lateinit var navController: NavController
     private val viewModel by navGraphViewModels<RegisterViewModel>(R.id.login_graph) {
         viewModelFactory

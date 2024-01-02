@@ -1,4 +1,4 @@
-package com.example.coffeeapp.presentation.adapters
+package com.example.coffeeapp.presentation.adapters.decorators
 
 import android.content.Context
 import android.graphics.Rect
