@@ -6,7 +6,9 @@ import android.util.DisplayMetrics
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 
-class VerticalMarginItemDecoration(private val spaceSizeDp: Float) : RecyclerView.ItemDecoration() {
+class VerticalMarginItemDecoration(
+    private val spaceSizeDp: Float
+) : RecyclerView.ItemDecoration() {
 
     override fun getItemOffsets(
         outRect: Rect,
@@ -19,6 +21,7 @@ class VerticalMarginItemDecoration(private val spaceSizeDp: Float) : RecyclerVie
     }
 
     private fun convertDpToPixel(dp: Float, context: Context): Float {
-        return dp * (context.resources.displayMetrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)
+        val displayPixelDensity = context.resources.displayMetrics.densityDpi
+        return dp * (displayPixelDensity.toFloat() / DisplayMetrics.DENSITY_DEFAULT)
     }
 }

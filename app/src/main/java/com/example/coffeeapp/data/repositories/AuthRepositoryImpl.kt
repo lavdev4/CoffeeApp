@@ -15,16 +15,16 @@ class AuthRepositoryImpl @Inject constructor(
     private val mapper: AuthMapper
 ) : AuthRepository {
 
-    override suspend fun registerUser(login: String, password: String): NetworkResultEntity<String> {
+    override suspend fun loginUser(login: String, password: String): NetworkResultEntity<String> {
         val response = withContext(Dispatchers.IO) {
-            apiService.register(mapper.mapLoginPasswordToLoginData(login, password))
+            apiService.login(mapper.mapLoginPasswordToLoginData(login, password))
         }
         return mapper.mapResponseToResultWithToken(response)
     }
 
-    override suspend fun loginUser(login: String, password: String): NetworkResultEntity<String> {
+    override suspend fun registerUser(login: String, password: String): NetworkResultEntity<String> {
         val response = withContext(Dispatchers.IO) {
-            apiService.login(mapper.mapLoginPasswordToLoginData(login, password))
+            apiService.register(mapper.mapLoginPasswordToLoginData(login, password))
         }
         return mapper.mapResponseToResultWithToken(response)
     }

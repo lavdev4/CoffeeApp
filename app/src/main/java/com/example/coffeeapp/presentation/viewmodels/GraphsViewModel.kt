@@ -13,7 +13,5 @@ class GraphsViewModel @Inject constructor() : ViewModel() {
     val graphState: LiveData<GraphState>
         get() = _graphState.distinctUntilChanged()
 
-    fun setGraphState(graph: GraphState) {
-        _graphState.value = graph
-    }
+    fun setGraphState(graph: GraphState) { _graphState.value = graph }
 }

@@ -23,7 +23,14 @@ android {
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField("String", "API_BASE_URL", "\"${localProperties.getProperty("api_base_url")}\"")
+        buildConfigField(
+            "String", "API_BASE_URL",
+            "\"${localProperties.getProperty("api_base_url")}\""
+        )
+        buildConfigField(
+            "String", "Y_MAPS_API_KEY",
+            "\"${localProperties.getProperty("y_maps_api_key")}\""
+        )
     }
 
     buildTypes {
@@ -54,6 +61,8 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.9.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+
+    implementation("com.yandex.android:maps.mobile:4.4.0-lite")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

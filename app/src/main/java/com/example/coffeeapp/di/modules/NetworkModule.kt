@@ -1,7 +1,7 @@
 package com.example.coffeeapp.di.modules
 
 import com.example.coffeeapp.data.network.ApiService
-import com.example.coffeeapp.data.network.NetworkConnectionInterceptor
+import com.example.coffeeapp.data.network.interceptors.NetworkConnectionInterceptor
 import com.example.coffeeapp.di.annotations.ApiBaseUrl
 import com.example.coffeeapp.di.annotations.ApplicationScope
 import com.google.gson.Gson
@@ -23,8 +23,8 @@ interface NetworkModule {
     companion object {
         @ApplicationScope
         @Provides
-        fun provideGson(): Gson {
-            val bigDecimalTypeAdapter = object : TypeAdapter<BigDecimal>() {
+        fun provideGsonBigDecimalTypeAdapter(): TypeAdapter<BigDecimal> {
+            return object : TypeAdapter<BigDecimal>() {
                 override fun write(writer: JsonWriter?, value: BigDecimal?) {
                     writer?.value(value.toString())
                 }
@@ -32,6 +32,13 @@ interface NetworkModule {
                     return BigDecimal(reader?.nextString())
                 }
             }
+        }
+
+        @ApplicationScope
+        @Provides
+        fun provideGson(
+            bigDecimalTypeAdapter: TypeAdapter<BigDecimal>
+        ): Gson {
             return GsonBuilder()
                 .registerTypeAdapter(BigDecimal::class.java, bigDecimalTypeAdapter)
                 .create()

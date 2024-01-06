@@ -5,6 +5,7 @@ import com.example.coffeeapp.di.annotations.ApiBaseUrl
 import com.example.coffeeapp.di.annotations.ApplicationScope
 import com.example.coffeeapp.di.annotations.PreferencesName
 import com.example.coffeeapp.di.modules.DataModule
+import com.example.coffeeapp.di.modules.LocationModule
 import com.example.coffeeapp.di.modules.NetworkModule
 import com.example.coffeeapp.di.modules.PreferencesModule
 import com.example.coffeeapp.di.modules.ViewModelModule
@@ -17,7 +18,8 @@ import dagger.Component
     ViewModelModule::class,
     NetworkModule::class,
     PreferencesModule::class,
-    DataModule::class
+    DataModule::class,
+    LocationModule::class
 ])
 interface ApplicationComponent {
 

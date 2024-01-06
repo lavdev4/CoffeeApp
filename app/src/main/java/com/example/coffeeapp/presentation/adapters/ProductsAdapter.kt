@@ -35,7 +35,7 @@ class ProductsAdapter(
         }
     }
 
-    //item blink fix
+    /** Item blink fix */
     override fun onBindViewHolder(
         holder: ProductsViewHolder,
         position: Int,
@@ -44,7 +44,7 @@ class ProductsAdapter(
         if (payloads.isNotEmpty()) {
             val bundle = (payloads[0] as Bundle)
             holder.binding.count.text = bundle.getInt(PAYLOAD_QUANTITY).toString()
-        } else { super.onBindViewHolder(holder, position, payloads) }
+        } else super.onBindViewHolder(holder, position, payloads)
     }
 
     inner class ProductsViewHolder(val binding: ItemProductsBinding) : ViewHolder(binding.root) {
@@ -67,11 +67,11 @@ class ProductsAdapter(
         }
 
         override fun areContentsTheSame(oldItem: ProductEntity, newItem: ProductEntity): Boolean {
-            return oldItem.count == newItem.count
+            return oldItem == newItem
         }
 
-        //item blink fix
-        override fun getChangePayload(oldItem: ProductEntity, newItem: ProductEntity): Any? {
+        /** Item blink fix */
+        override fun getChangePayload(oldItem: ProductEntity, newItem: ProductEntity): Any {
             return Bundle().apply {
                 putInt(PAYLOAD_QUANTITY, newItem.count)
             }

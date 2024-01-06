@@ -20,12 +20,9 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class RegisterScreen : Fragment() {
-    @Inject
-    lateinit var viewModelFactory: LoginGraphVMFactory
+    @Inject lateinit var viewModelFactory: LoginGraphVMFactory
+    private val viewModel by navGraphViewModels<RegisterViewModel>(R.id.login_graph) { viewModelFactory }
     private lateinit var navController: NavController
-    private val viewModel by navGraphViewModels<RegisterViewModel>(R.id.login_graph) {
-        viewModelFactory
-    }
     private var _binding: FragmentRegisterBinding? = null
     private val binding: FragmentRegisterBinding
         get() = _binding ?: throw RuntimeException("FragmentRegisterBinding is null")

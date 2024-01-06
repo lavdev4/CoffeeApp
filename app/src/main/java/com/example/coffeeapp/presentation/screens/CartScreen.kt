@@ -19,11 +19,8 @@ import com.example.coffeeapp.presentation.viewmodels.factories.CafesGraphVMFacto
 import javax.inject.Inject
 
 class CartScreen : Fragment() {
-    @Inject
-    lateinit var viewModelFactory: CafesGraphVMFactory
-    private val viewModel by navGraphViewModels<ProductsViewModel>(R.id.cafes_graph) {
-        viewModelFactory
-    }
+    @Inject lateinit var viewModelFactory: CafesGraphVMFactory
+    private val viewModel by navGraphViewModels<ProductsViewModel>(R.id.menu_graph) { viewModelFactory }
     private var _binding: FragmentCartBinding? = null
     private val binding: FragmentCartBinding
         get() = _binding ?: throw RuntimeException("FragmentCartBinding is null")
@@ -44,7 +41,8 @@ class CartScreen : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        observeCartList()
+        val cartAdapter = setCartAdapter()
+        observeCartList(cartAdapter)
     }
 
     override fun onDestroyView() {
@@ -60,15 +58,14 @@ class CartScreen : Fragment() {
         binding.waitTime.text = getString(R.string.cart_screen_waiting_hint)
     }
 
-    private fun observeCartList() {
-        val adapter = createCartAdapter()
+    private fun observeCartList(adapter: CartProductsAdapter) {
         viewModel.selectedProductsList.observe(viewLifecycleOwner) {
             adapter.submitList(it)
             if (it.isEmpty()) setWaitingHint() else setWaitingTime(15)
         }
     }
 
-    private fun createCartAdapter(): CartProductsAdapter {
+    private fun setCartAdapter(): CartProductsAdapter {
         val menuAdapter = CartProductsAdapter { item, quantity ->
             viewModel.updateSelectedProducts(item, quantity)
         }

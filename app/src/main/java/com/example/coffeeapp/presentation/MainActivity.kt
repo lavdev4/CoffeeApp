@@ -17,33 +17,36 @@ import com.example.coffeeapp.R
 import com.example.coffeeapp.databinding.ActivityMainBinding
 import com.example.coffeeapp.di.MainActivitySubcomponent
 import com.example.coffeeapp.domain.entities.AuthError
+import com.example.coffeeapp.domain.entities.LocationResultEntity
 import com.example.coffeeapp.domain.entities.NetworkError
 import com.example.coffeeapp.presentation.viewmodels.GraphsViewModel
 import com.example.coffeeapp.presentation.viewmodels.contracts.AuthErrorViewModel
+import com.example.coffeeapp.presentation.viewmodels.contracts.LocationStateViewModel
 import com.example.coffeeapp.presentation.viewmodels.contracts.NetworkErrorViewModel
 import com.example.coffeeapp.presentation.viewmodels.contracts.ScreenStateViewModel
 import com.example.coffeeapp.presentation.viewmodels.factories.ApplicationVMFactory
 import com.example.coffeeapp.presentation.viewmodels.factories.CafesGraphVMFactory
 import com.example.coffeeapp.presentation.viewmodels.factories.LoginGraphVMFactory
+import com.example.coffeeapp.presentation.viewmodels.factories.MenuGraphVMFactory
+import com.example.coffeeapp.presentation.viewmodels.states.Event
 import com.example.coffeeapp.presentation.viewmodels.states.GraphState
 import com.example.coffeeapp.presentation.viewmodels.states.ScreenState
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
-    @Inject
-    lateinit var viewModelFactory: ApplicationVMFactory
-    @Inject
-    lateinit var loginGraphVMFactory: LoginGraphVMFactory
-    @Inject
-    lateinit var cafesGraphVMFactory: CafesGraphVMFactory
-    private val graphViewModel by viewModels<GraphsViewModel> { viewModelFactory }
     lateinit var mainActivitySubcomponent: MainActivitySubcomponent
+    @Inject lateinit var viewModelFactory: ApplicationVMFactory
+    @Inject lateinit var loginGraphVMFactory: LoginGraphVMFactory
+    @Inject lateinit var cafesGraphVMFactory: CafesGraphVMFactory
+    @Inject lateinit var menuGraphVMFactory: MenuGraphVMFactory
+    private val graphViewModel by viewModels<GraphsViewModel> { viewModelFactory }
     private lateinit var navController: NavController
     private lateinit var binding: ActivityMainBinding
+
     private var destinationChangedListener: NavController.OnDestinationChangedListener? = null
     private val loginGraphId = R.id.login_graph
     private val cafesGraphId = R.id.cafes_graph
-    private var currentGraphState: GraphState? = null
+    private val menuGraphId = R.id.menu_graph
 
     override fun onCreate(savedInstanceState: Bundle?) {
         mainActivitySubcomponent = (application as CoffeeApplication).applicationComponent
@@ -74,15 +77,15 @@ class MainActivity : AppCompatActivity() {
 
     private fun listenToGraphChange() {
         graphViewModel.graphState.observe(this) { graphState ->
-            currentGraphState = graphState
             when(graphState) {
                 /** The view model of each screen is tied to the lifecycle
                  * of the navigation graph in which this screen is located.
                  * Thus, having made sure that we are in a specific graph,
                  * we can get a view model of any screen from the current
-                 * graph and track their state.*/
+                 * graph and track their state. */
                 GraphState.LoginGraph -> observeGraph(loginGraphId)
                 GraphState.CafesGraph -> observeGraph(cafesGraphId)
+                GraphState.MenuGraph -> observeGraph(menuGraphId)
             }
         }
     }
@@ -90,11 +93,11 @@ class MainActivity : AppCompatActivity() {
     private fun listenToDestinationChange() {
         destinationChangedListener =
             NavController.OnDestinationChangedListener { _, destination, _ ->
+                setScreenTitle(destination.label.toString())
                 destination.parent?.id?.let {
                     setBackButtonVisible(it)
                     setGraphState(it)
                 }
-                setScreenTitle(destination.label.toString())
             }
         navController.addOnDestinationChangedListener(
             destinationChangedListener as NavController.OnDestinationChangedListener
@@ -105,18 +108,18 @@ class MainActivity : AppCompatActivity() {
         when(destinationId) {
             loginGraphId -> graphViewModel.setGraphState(GraphState.LoginGraph)
             cafesGraphId -> graphViewModel.setGraphState(GraphState.CafesGraph)
+            menuGraphId -> graphViewModel.setGraphState(GraphState.MenuGraph)
         }
     }
 
-    private fun setScreenTitle(title: String) {
-        binding.title.text = title
-    }
+    private fun setScreenTitle(title: String) { binding.title.text = title }
 
     private fun setBackButtonVisible(graphId: Int) {
         with(binding.backButton) {
             when (graphId) {
                 loginGraphId -> visibility = View.GONE
                 cafesGraphId -> visibility = View.VISIBLE
+                menuGraphId -> visibility = View.VISIBLE
             }
         }
     }
@@ -136,30 +139,47 @@ class MainActivity : AppCompatActivity() {
         observeNetworkErrors(graphViewModels, lifecycleOwner)
         observeAuthErrors(graphViewModels, lifecycleOwner)
         observeViewStates(graphViewModels, lifecycleOwner)
+        observeLocationStates(graphViewModels, lifecycleOwner)
     }
 
     private fun observeNetworkErrors(viewModels: List<ViewModel>, lifecycleOwner: LifecycleOwner) {
-        MediatorLiveData<NetworkError>().apply {
+        MediatorLiveData<Event<NetworkError>>().apply {
             viewModels.forEach { vm ->
                 if (vm is NetworkErrorViewModel) addSource(vm.networkErrors) { value = it }
             }
-        }.observe(lifecycleOwner) { error -> reactToNetworkError(error) }
+        }.observe(lifecycleOwner) { error ->
+            error.getContentIfNotHandled()?.let { reactToNetworkError(it) }
+        }
     }
 
     private fun observeAuthErrors(viewModels: List<ViewModel>, lifecycleOwner: LifecycleOwner) {
-        MediatorLiveData<AuthError>().apply {
+        MediatorLiveData<Event<AuthError>>().apply {
             viewModels.forEach { vm ->
                 if (vm is AuthErrorViewModel) addSource(vm.authErrors) { value = it }
             }
-        }.observe(lifecycleOwner) { error -> reactToAuthError(error) }
+        }.observe(lifecycleOwner) { error ->
+            error.getContentIfNotHandled()?.let { reactToAuthError(it) }
+        }
     }
 
     private fun observeViewStates(viewModels: List<ViewModel>, lifecycleOwner: LifecycleOwner) {
-        MediatorLiveData<ScreenState>().apply {
+        MediatorLiveData<Event<ScreenState>>().apply {
             viewModels.forEach { vm ->
                 if (vm is ScreenStateViewModel) addSource(vm.screenState) { value = it }
             }
-        }.observe(lifecycleOwner) { state -> reactToStateChange(state) }
+        }.observe(lifecycleOwner) { state ->
+            state.getContentIfNotHandled()?.let { reactToStateChange(it) }
+        }
+    }
+
+    private fun observeLocationStates(viewModels: List<ViewModel>, lifecycleOwner: LifecycleOwner) {
+        MediatorLiveData<Event<LocationResultEntity>>().apply {
+            viewModels.forEach { vm ->
+                if (vm is LocationStateViewModel) addSource(vm.locationState) { value = it }
+            }
+        }.observe(lifecycleOwner) { state ->
+            state.getContentIfNotHandled()?.let { reactToLocationStateChange(it) }
+        }
     }
 
     private fun getGraphViewModels(
@@ -173,18 +193,21 @@ class MainActivity : AppCompatActivity() {
             cafesGraphId -> with(cafesGraphVMFactory) {
                 viewModels.keys.map { ViewModelProvider(viewModelStoreOwner, this)[it] }
             }
+            menuGraphId -> with(menuGraphVMFactory) {
+                viewModels.keys.map { ViewModelProvider(viewModelStoreOwner, this)[it] }
+            }
             else -> throw RuntimeException("Graph with id{$graphId} is not handled in MainActivity.")
         }
     }
 
     private fun reactToAuthError(error: AuthError) {
         when (error) {
-            AuthError.LoginIsBlank -> showToast("Поле логина пусто")
-            AuthError.PasswordIsBlank -> showToast("Поле пароля пусто")
-            AuthError.RepeatPasswordIsBlank -> showToast("Поле подтверждения пароля пусто")
-            AuthError.DataMismatch -> showToast("Неправильный e-mail или пароль")
-            AuthError.DataRejected -> showToast("Этот e-mail занят")
-            AuthError.PasswordConfirmFailed -> showToast("Повторный ввод пароля не совпал")
+            AuthError.LoginIsBlank -> showToast(getString(R.string.toast_empty_login))
+            AuthError.PasswordIsBlank -> showToast(getString(R.string.toast_password_blank))
+            AuthError.RepeatPasswordIsBlank -> showToast(getString(R.string.toast_repeat_password_blank))
+            AuthError.DataMismatch -> showToast(getString(R.string.toast_entry_data_mismatch))
+            AuthError.DataRejected -> showToast(getString(R.string.toast_e_mail_occupied))
+            AuthError.PasswordConfirmFailed -> showToast(getString(R.string.toast_wrong_confirmation_password))
             is AuthError.AuthNetworkError -> reactToNetworkError(error.networkError)
         }
     }
@@ -192,7 +215,7 @@ class MainActivity : AppCompatActivity() {
     private fun reactToNetworkError(error: NetworkError) {
         when (error) {
             NetworkError.NoInternet -> {
-                showToast("Нет интернет соединения")
+                showToast(getString(R.string.toast_no_internet))
                 navigateToLoginGraph()
             }
             //handled in reactToAuthError()
@@ -200,11 +223,11 @@ class MainActivity : AppCompatActivity() {
             //handled in reactToAuthError()
             NetworkError.Rejected -> {}
             NetworkError.TokenExpired -> {
-                showToast("Необходима повторная авторизация")
+                showToast(getString(R.string.toast_required_authorisation))
                 navigateToLoginGraph()
             }
             NetworkError.NoTokenProvided -> navigateToLoginGraph()
-            NetworkError.UnknownError -> showToast("Ошибка сети")
+            NetworkError.UnknownError -> showToast(getString(R.string.toast_network_error))
         }
     }
 
@@ -214,6 +237,16 @@ class MainActivity : AppCompatActivity() {
             ScreenState.Loading -> showProgress(true)
             ScreenState.Presenting -> showProgress(false)
             ScreenState.Error -> showProgress(false)
+        }
+    }
+
+    private fun reactToLocationStateChange(state: LocationResultEntity) {
+        when (state) {
+            LocationResultEntity.Success -> {}
+            LocationResultEntity.NoProvider -> {
+                showToast(getString(R.string.toast_location_offline))
+            }
+            LocationResultEntity.NoPermission -> {}
         }
     }
 

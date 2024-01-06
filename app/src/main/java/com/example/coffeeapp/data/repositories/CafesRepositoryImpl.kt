@@ -17,9 +17,7 @@ class CafesRepositoryImpl @Inject constructor(
 ) : CafesRepository {
 
     override suspend fun getCafes(token: String): NetworkResultEntity<List<CafeEntity>> {
-        val response = withContext(Dispatchers.IO) {
-            apiService.getLocations(token)
-        }
+        val response = withContext(Dispatchers.IO) { apiService.getLocations(token) }
         return mapper.mapResponseToResultWithCafes(response)
     }
 }

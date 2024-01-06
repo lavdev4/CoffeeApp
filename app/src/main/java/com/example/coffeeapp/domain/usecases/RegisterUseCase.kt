@@ -27,9 +27,9 @@ class RegisterUseCase @Inject constructor(
             NetworkResultEntity.Failure(NetworkError.Rejected) -> {
                 AuthResult.Failure(AuthError.DataRejected)
             }
-            else -> {
+            is NetworkResultEntity.Failure -> {
                 AuthResult.Failure(
-                    AuthError.AuthNetworkError((result as NetworkResultEntity.Failure).error)
+                    AuthError.AuthNetworkError(result.error)
                 )
             }
         }

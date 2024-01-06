@@ -8,9 +8,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.coffeeapp.R
 import com.example.coffeeapp.databinding.ItemCartBinding
-import com.example.coffeeapp.databinding.ItemProductsBinding
 import com.example.coffeeapp.domain.entities.ProductEntity
-import com.squareup.picasso.Picasso
 
 class CartProductsAdapter(
     private val onItemCountChanged: (itemId: Int, count: Int) -> Unit,
@@ -35,7 +33,7 @@ class CartProductsAdapter(
         }
     }
 
-    //item blink fix
+    /** Item blink fix */
     override fun onBindViewHolder(
         holder: CartProductsViewHolder,
         position: Int,
@@ -44,7 +42,7 @@ class CartProductsAdapter(
         if (payloads.isNotEmpty()) {
             val bundle = (payloads[0] as Bundle)
             holder.binding.count.text = bundle.getInt(PAYLOAD_QUANTITY).toString()
-        } else { super.onBindViewHolder(holder, position, payloads) }
+        } else super.onBindViewHolder(holder, position, payloads)
     }
 
     inner class CartProductsViewHolder(
@@ -72,8 +70,8 @@ class CartProductsAdapter(
             return oldItem == newItem
         }
 
-        //item blink fix
-        override fun getChangePayload(oldItem: ProductEntity, newItem: ProductEntity): Any? {
+        /** Item blink fix */
+        override fun getChangePayload(oldItem: ProductEntity, newItem: ProductEntity): Any {
             return Bundle().apply {
                 putInt(PAYLOAD_QUANTITY, newItem.count)
             }

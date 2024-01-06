@@ -11,23 +11,21 @@ import androidx.navigation.Navigation
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.navGraphViewModels
 import androidx.recyclerview.widget.GridLayoutManager
+import com.example.coffeeapp.MenuGraphArgs
 import com.example.coffeeapp.R
 import com.example.coffeeapp.databinding.FragmentMenuBinding
 import com.example.coffeeapp.presentation.MainActivity
 import com.example.coffeeapp.presentation.adapters.ProductsAdapter
 import com.example.coffeeapp.presentation.adapters.decorators.GridMarginItemDecoration
 import com.example.coffeeapp.presentation.viewmodels.ProductsViewModel
-import com.example.coffeeapp.presentation.viewmodels.factories.CafesGraphVMFactory
+import com.example.coffeeapp.presentation.viewmodels.factories.MenuGraphVMFactory
 import javax.inject.Inject
 
 class MenuScreen : Fragment() {
-    @Inject
-    lateinit var viewModelFactory: CafesGraphVMFactory
+    @Inject lateinit var viewModelFactory: MenuGraphVMFactory
+    private val viewModel by navGraphViewModels<ProductsViewModel>(R.id.menu_graph) { viewModelFactory }
     private lateinit var navController: NavController
-    private val args: MenuScreenArgs by navArgs()
-    private val viewModel by navGraphViewModels<ProductsViewModel>(R.id.cafes_graph) {
-        viewModelFactory
-    }
+    private val args: MenuGraphArgs by navArgs()
     private var _binding: FragmentMenuBinding? = null
     private val binding: FragmentMenuBinding
         get() = _binding ?: throw RuntimeException("FragmentMenuBinding is null")
@@ -49,8 +47,9 @@ class MenuScreen : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         navController = Navigation.findNavController(view)
-        viewModel.updateProducts(args.locationId)
-        observeMenuList()
+        viewModel.initialise(args.locationId)
+        val adapter = setMenuAdapter()
+        observeMenuList(adapter)
         setupPaymentButton()
     }
 
@@ -63,14 +62,11 @@ class MenuScreen : Fragment() {
         binding.paymentButton.setOnClickListener { navigateToCartScreen() }
     }
 
-    private fun observeMenuList() {
-        val adapter = createMenuAdapter()
-        viewModel.productsList.observe(viewLifecycleOwner) {
-            adapter.submitList(it)
-        }
+    private fun observeMenuList(adapter: ProductsAdapter) {
+        viewModel.productsList.observe(viewLifecycleOwner) { adapter.submitList(it) }
     }
 
-    private fun createMenuAdapter(): ProductsAdapter {
+    private fun setMenuAdapter(): ProductsAdapter {
         val menuAdapter = ProductsAdapter { item, quantity ->
             viewModel.updateSelectedProducts(item, quantity)
         }

@@ -25,9 +25,9 @@ class LoginUseCase @Inject constructor(
             NetworkResultEntity.Failure(NetworkError.Unauthorised) -> {
                 AuthResult.Failure(AuthError.DataMismatch)
             }
-            else -> {
+            is NetworkResultEntity.Failure -> {
                 AuthResult.Failure(
-                    AuthError.AuthNetworkError((result as NetworkResultEntity.Failure).error)
+                    AuthError.AuthNetworkError(result.error)
                 )
             }
         }

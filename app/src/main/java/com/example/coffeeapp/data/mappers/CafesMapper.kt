@@ -18,6 +18,8 @@ class CafesMapper @Inject constructor() {
         } else {
             when (response.code()) {
                 401 -> NetworkResultEntity.Failure(NetworkError.TokenExpired)
+                /** Custom response from
+                 * [com.example.coffeeapp.data.network.interceptors.NetworkConnectionInterceptor] */
                 1 -> NetworkResultEntity.Failure(NetworkError.NoInternet)
                 else -> NetworkResultEntity.Failure(NetworkError.UnknownError)
             }

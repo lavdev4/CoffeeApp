@@ -2,8 +2,7 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main_graph"
-    app:startDestination="@id/cart_screen">
+    android:id="@+id/main_graph">
 
     <navigation android:id="@+id/login_graph"
         app:startDestination="@id/login_screen">
@@ -36,8 +35,8 @@
             android:label="@string/cafes_screen_title"
             tools:layout="@layout/fragment_cafes" >
             <action
-                android:id="@+id/action_cafes_screen_to_menu_screen"
-                app:destination="@id/menu_screen" />
+                android:id="@+id/action_cafes_screen_to_mapScreen"
+                app:destination="@id/mapScreen" />
         </fragment>
         <action
             android:id="@+id/action_global_login_graph"
@@ -45,21 +44,39 @@
             app:popUpTo="@id/main_graph"
             app:popUpToInclusive="true" />
         <fragment
+            android:id="@+id/mapScreen"
+            android:name="com.example.coffeeapp.presentation.screens.MapScreen"
+            android:label="@string/map_screen_title"
+            tools:layout="@layout/fragment_map" />
+        <action
+            android:id="@+id/action_global_menu_graph"
+            app:destination="@id/menu_graph" />
+
+    </navigation>
+    <navigation android:id="@+id/menu_graph"
+        app:startDestination="@id/menu_screen">
+        <fragment
             android:id="@+id/menu_screen"
             android:name="com.example.coffeeapp.presentation.screens.MenuScreen"
             android:label="@string/menu_screen_title"
             tools:layout="@layout/fragment_menu">
-            <argument
-                android:name="location_id"
-                app:argType="integer" />
             <action
-                android:id="@+id/action_menu_screen_to_cartScreen"
+                android:id="@+id/action_menu_screen_to_cart_screen"
                 app:destination="@id/cart_screen" />
         </fragment>
         <fragment
             android:id="@+id/cart_screen"
             android:name="com.example.coffeeapp.presentation.screens.CartScreen"
             android:label="@string/cart_screen_title"
-            tools:layout="@layout/fragment_cart" />
+            tools:layout="@layout/fragment_cart" >
+        </fragment>
+        <action
+            android:id="@+id/action_global_login_graph2"
+            app:destination="@id/login_graph"
+            app:popUpTo="@id/main_graph"
+            app:popUpToInclusive="true" />
+        <argument
+            android:name="location_id"
+            app:argType="integer" />
     </navigation>
 </navigation>

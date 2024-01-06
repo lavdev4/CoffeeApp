@@ -18,4 +18,17 @@
     <string name="cart_screen_waiting_time">Время ожидания заказа\n%1$s минут!\nСпасибо, что выбрали нас!</string>
     <string name="cart_screen_waiting_hint">Пожалуйста, добавьте товары в корзину.</string>
     <string name="item_price_wrapper">%1$s руб</string>
+    <string name="distance_kilometers_format">%1$s км от вас</string>
+    <string name="distance_meters_format">%1$s м от вас</string>
+    <string name="toast_empty_login">Поле логина пусто</string>
+    <string name="toast_password_blank">Поле пароля пусто</string>
+    <string name="toast_repeat_password_blank">Поле подтверждения пароля пусто</string>
+    <string name="toast_entry_data_mismatch">Неправильный e-mail или пароль</string>
+    <string name="toast_e_mail_occupied">Этот e-mail занят</string>
+    <string name="toast_wrong_confirmation_password">Повторный ввод пароля не совпал</string>
+    <string name="toast_no_internet">Нет интернет соединения</string>
+    <string name="toast_required_authorisation">Необходима повторная авторизация</string>
+    <string name="toast_network_error">Ошибка сети</string>
+    <string name="toast_location_offline">Навигация отключена в настройках телефона.</string>
+    <string name="map_screen_title">Карта</string>
 </resources>

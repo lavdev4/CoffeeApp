@@ -1,8 +1,9 @@
-package com.example.coffeeapp.data.network
+package com.example.coffeeapp.data.network.interceptors
 
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import com.example.coffeeapp.di.annotations.ApplicationScope
 import okhttp3.Interceptor
 import okhttp3.Interceptor.Chain
 import okhttp3.Protocol
@@ -10,20 +11,24 @@ import okhttp3.Response
 import okhttp3.ResponseBody
 import javax.inject.Inject
 
-
+@ApplicationScope
 class NetworkConnectionInterceptor @Inject constructor(
-    private val applicationContext: Context
+    private val applicationContext: Context,
 ) : Interceptor {
 
     override fun intercept(chain: Chain): Response {
-        if (!isConnected) return Response.Builder()
-                .request(chain.request())
-                .protocol(Protocol.HTTP_1_1)
-                .code(1)
-                .message("No network connection")
-                .body(ResponseBody.create(null, ""))
-                .build()
+        if (!isConnected) return buildNoInternetResponse(chain)
         return chain.proceed(chain.request())
+    }
+
+    private fun buildNoInternetResponse(chain: Chain): Response {
+        return Response.Builder()
+            .protocol(Protocol.HTTP_2)
+            .request(chain.request())
+            .code(1)
+            .message("No network connection")
+            .body(ResponseBody.create(null, ""))
+            .build()
     }
 
     private val isConnected: Boolean

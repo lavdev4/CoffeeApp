@@ -2,14 +2,11 @@ package com.example.coffeeapp.data.mappers
 
 import com.example.coffeeapp.data.network.models.AuthResponseDto
 import com.example.coffeeapp.data.network.models.LoginDataDto
-import com.example.coffeeapp.di.annotations.ApplicationScope
 import com.example.coffeeapp.domain.entities.NetworkError
 import com.example.coffeeapp.domain.entities.NetworkResultEntity
 import retrofit2.Response
-
 import javax.inject.Inject
 
-@ApplicationScope
 class AuthMapper @Inject constructor() {
 
     fun mapLoginPasswordToLoginData(login: String, password: String): LoginDataDto {
@@ -23,6 +20,8 @@ class AuthMapper @Inject constructor() {
             when (response.code()) {
                 401 -> NetworkResultEntity.Failure(NetworkError.Unauthorised)
                 406 -> NetworkResultEntity.Failure(NetworkError.Rejected)
+                /** Custom response from
+                 * [com.example.coffeeapp.data.network.interceptors.NetworkConnectionInterceptor] */
                 1 -> NetworkResultEntity.Failure(NetworkError.NoInternet)
                 else -> NetworkResultEntity.Failure(NetworkError.UnknownError)
             }

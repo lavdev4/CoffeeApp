@@ -1,0 +1,3 @@
+package com.example.coffeeapp.presentation.viewmodels.contracts
+
+interface MenuGraphViewModel
